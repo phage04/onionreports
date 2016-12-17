@@ -63,16 +63,16 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                 let parameters = [
                     "Authorization" : "api:\(key)",
                     "from": "info@\(mailGunURL)",
-                    "to": "\(clientEmailText.text)",
-                    "subject": "OnionApps Report (\(clientNameText.text)): \(fromDateText.text) - \(toDateText.text)",
-                    "text": "Hi \(clientNameText.text)! Attached is the report for this period! Thanks!"
+                    "to": "\(self.clientEmailText.text!)",
+                    "subject": "OnionApps Report for (\(clientNameText.text!)): \(fromDateText.text!) - \(toDateText.text!)",
+                    "text": "Dear \(clientNameText.text!), Attached is the report for this period. Thank you!"
                 ]
                 
                 _ = Alamofire.request("https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).authenticate(user: "api", password: key).response { response in
 
                     if response.error == nil{
                         SwiftSpinner.hide()
-                        self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent!", VC: self)
+                        self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent to \(self.clientEmailText.text!)!", VC: self)
                     } else {
                         SwiftSpinner.hide()
                         self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
@@ -98,16 +98,6 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         let datePickerView  : UIDatePicker = UIDatePicker(frame: CGRect(x: (self.view.frame.size.width/2) - (320/2), y: 40, width: 0, height: 0))
         
         datePickerView.datePickerMode = UIDatePickerMode.date
-        datePickerView.minuteInterval = 15
-        
-        let dateFromNow = (userCalendar as NSCalendar).date(
-            byAdding: [.day],
-            value: 90,
-            to: Date(),
-            options: [])
-        
-        datePickerView.maximumDate = dateFromNow
-        datePickerView.minimumDate = Date()
         
         inputView.addSubview(datePickerView)
         inputView.backgroundColor = UIColor.white
@@ -137,16 +127,6 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         let datePickerView  : UIDatePicker = UIDatePicker(frame: CGRect(x: (self.view.frame.size.width/2) - (320/2), y: 40, width: 0, height: 0))
         
         datePickerView.datePickerMode = UIDatePickerMode.date
-        datePickerView.minuteInterval = 15
-        
-        let dateFromNow = (userCalendar as NSCalendar).date(
-            byAdding: [.day],
-            value: 90,
-            to: Date(),
-            options: [])
-        
-        datePickerView.maximumDate = dateFromNow
-        datePickerView.minimumDate = Date()
         
         inputView.addSubview(datePickerView)
         inputView.backgroundColor = UIColor.white
