@@ -5,8 +5,13 @@
 //  Created by Lyle Christianne Jover on 16/12/2016.
 //  Copyright © 2016 OnionApps Inc. All rights reserved.
 //
-
+import Foundation
+import SystemConfiguration
 import UIKit
+import Alamofire
+import Firebase
+import FirebaseDatabase
+import SwiftSpinner
 
 class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
@@ -24,6 +29,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     let clientPickerData = ["Burger St.",
                             "Size Matters"]
     
+    //MAILGUN
+    let mailGunKey = "key-5b34852ee5f4c8467b150056b0b5ca1e"
+    let mailGunURL = "onionapps.com"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -40,6 +49,47 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
 
     @IBAction func didPressSend(_ sender: Any) {
+        SwiftSpinner.show("the nerds are working...").addTapHandler({
+            SwiftSpinner.hide()
+        }, subtitle: "tap anytime to exit")
+        
+        
+        if checkConnectivity()  {
+            
+            if fromDateText.text! != "" && toDateText.text! != "" && clientNameText.text! != "" && clientEmailText.text! != "" {
+                
+                let key = mailGunKey
+                
+                let parameters = [
+                    "Authorization" : "api:\(key)",
+                    "from": "info@\(mailGunURL)",
+                    "to": "\(clientEmailText.text)",
+                    "subject": "OnionApps Report (\(clientNameText.text)): \(fromDateText.text) - \(toDateText.text)",
+                    "text": "Hi \(clientNameText.text)! Attached is the report for this period! Thanks!"
+                ]
+                
+                _ = Alamofire.request("https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).authenticate(user: "api", password: key).response { response in
+
+                    if response.error == nil{
+                        SwiftSpinner.hide()
+                        self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent!", VC: self)
+                    } else {
+                        SwiftSpinner.hide()
+                        self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
+                    }
+                    
+                }
+                
+            } else {
+                SwiftSpinner.hide()
+                self.showErrorAlert("Incomplete Information", msg: "Please complete all required information.", VC: self)
+                
+            }
+        } else {
+            SwiftSpinner.hide()
+            self.showErrorAlert("Network Error", msg: "Please check your internet connection.", VC: self)
+            
+        }
     }
   
     @IBAction func fromDateEditingBegun(_ sender: UITextField) {
@@ -165,6 +215,53 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     {
         clientNameText.text = clientPickerData[row]
     }
+    
+    func checkConnectivity() -> Bool {
+        if Reachability.isConnectedToNetwork() {
+            return true
+        } else {
+            
+            return false
+        }
+    }
+    
+    open class Reachability {
+        
+        class func isConnectedToNetwork() -> Bool {
+            var zeroAddress = sockaddr_in()
+            zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+            zeroAddress.sin_family = sa_family_t(AF_INET)
+            
+            guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+                $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                    SCNetworkReachabilityCreateWithAddress(nil, $0)
+                }
+            }) else {
+                return false
+            }
+            
+            var flags: SCNetworkReachabilityFlags = []
+            if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
+                return false
+            }
+            
+            let isReachable = flags.contains(.reachable)
+            let needsConnection = flags.contains(.connectionRequired)
+            
+            return (isReachable && !needsConnection)
+        }
+        
+    }
+    
+    func showErrorAlert(_ title: String, msg: String, VC: UIViewController) {
+        let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        
+        VC.present(alert, animated: true, completion: nil)
+        
+    }
+
 
 
 }
