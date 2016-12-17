@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import Firebase
+import FirebaseDatabase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +19,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        let filePath = Bundle.main.path(forResource: "BurgerSt", ofType:"plist")
+        let options = FIROptions(contentsOfFile:filePath)
+        FIRApp.configure(withName: "BurgerSt", options: options!)
+        FIRAuth(app: FIRApp.init(named: "BurgerSt")!)?.signInAnonymously()
+        
+        let filePath2 = Bundle.main.path(forResource: "SizeMatters", ofType:"plist")
+        let options2 = FIROptions(contentsOfFile:filePath2)
+        FIRApp.configure(withName: "SizeMatters", options: options2!)
+        FIRAuth(app: FIRApp.init(named: "SizeMatters")!)?.signInAnonymously()
         return true
     }
 

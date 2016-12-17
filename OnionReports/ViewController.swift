@@ -26,8 +26,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     var clientPicker = UIPickerView()
     let userCalendar = Calendar.current
     let DATE_FORMAT1 = "MMM dd, yyyy"
-    let clientPickerData = ["Burger St.",
-                            "Size Matters"]
+
     
     //MAILGUN
     let mailGunKey = "key-5b34852ee5f4c8467b150056b0b5ca1e"
@@ -49,47 +48,49 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
 
     @IBAction func didPressSend(_ sender: Any) {
+        
         SwiftSpinner.show("the nerds are working...").addTapHandler({
             SwiftSpinner.hide()
         }, subtitle: "tap anytime to exit")
         
-        
         if checkConnectivity()  {
             
             if fromDateText.text! != "" && toDateText.text! != "" && clientNameText.text! != "" && clientEmailText.text! != "" {
-                
-                let key = mailGunKey
-                
-                let parameters = [
-                    "Authorization" : "api:\(key)",
-                    "from": "info@\(mailGunURL)",
-                    "to": "\(self.clientEmailText.text!)",
-                    "subject": "OnionApps Report for (\(clientNameText.text!)): \(fromDateText.text!) - \(toDateText.text!)",
-                    "text": "Dear \(clientNameText.text!), Attached is the report for this period. Thank you!"
-                ]
-                
-                _ = Alamofire.request("https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).authenticate(user: "api", password: key).response { response in
-
-                    if response.error == nil{
-                        SwiftSpinner.hide()
-                        self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent to \(self.clientEmailText.text!)!", VC: self)
-                    } else {
-                        SwiftSpinner.hide()
-                        self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
-                    }
+        
+                downloadData(client: clientNameText.text!, completion: { (result) in
+                    print(result)
                     
-                }
+                    
+                    sendEmail()
+                })
                 
-            } else {
+               
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+            }else {
                 SwiftSpinner.hide()
                 self.showErrorAlert("Incomplete Information", msg: "Please complete all required information.", VC: self)
                 
             }
-        } else {
+        }else {
             SwiftSpinner.hide()
             self.showErrorAlert("Network Error", msg: "Please check your internet connection.", VC: self)
-            
+                
         }
+        
+
+       
     }
   
     @IBAction func fromDateEditingBegun(_ sender: UITextField) {
@@ -241,8 +242,33 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         VC.present(alert, animated: true, completion: nil)
         
     }
-
-
+    
+    func sendEmail(){
+ 
+                
+        let key = mailGunKey
+        
+        let parameters = [
+            "Authorization" : "api:\(key)",
+            "from": "info@\(mailGunURL)",
+            "to": "\(self.clientEmailText.text!)",
+            "subject": "OnionApps Report for (\(clientNameText.text!)): \(fromDateText.text!) - \(toDateText.text!)",
+            "text": "Dear \(clientNameText.text!), Attached is the report for this period. Thank you!"
+        ]
+        
+        _ = Alamofire.request("https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).authenticate(user: "api", password: key).response { response in
+            
+            if response.error == nil{
+                SwiftSpinner.hide()
+                self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent to \(self.clientEmailText.text!)!", VC: self)
+            } else {
+                SwiftSpinner.hide()
+                self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
+            }
+            
+        }
+        
+    }
 
 }
 

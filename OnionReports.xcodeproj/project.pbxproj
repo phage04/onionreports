@@ -14,7 +14,10 @@
 		DEA7E21E1E04AD9300FDF846 /* OnionReports.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = DEA7E21C1E04AD9300FDF846 /* OnionReports.xcdatamodeld */; };
 		DEA7E2201E04AD9300FDF846 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEA7E21F1E04AD9300FDF846 /* Assets.xcassets */; };
 		DEA7E2231E04AD9300FDF846 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DEA7E2211E04AD9300FDF846 /* LaunchScreen.storyboard */; };
-		DEA7E22D1E04B88F00FDF846 /* GoogleService-Info (3).plist in Resources */ = {isa = PBXBuildFile; fileRef = DEA7E22C1E04B88F00FDF846 /* GoogleService-Info (3).plist */; };
+		DEA7E22D1E04B88F00FDF846 /* BurgerSt.plist in Resources */ = {isa = PBXBuildFile; fileRef = DEA7E22C1E04B88F00FDF846 /* BurgerSt.plist */; };
+		DEA7E22F1E04C7B800FDF846 /* SizeMatters.plist in Resources */ = {isa = PBXBuildFile; fileRef = DEA7E22E1E04C7B800FDF846 /* SizeMatters.plist */; };
+		DEA7E2321E04C87B00FDF846 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA7E2311E04C87B00FDF846 /* DataService.swift */; };
+		DEA7E2341E04CCDC00FDF846 /* DataCruncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA7E2331E04CCDC00FDF846 /* DataCruncher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +32,10 @@
 		DEA7E21F1E04AD9300FDF846 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DEA7E2221E04AD9300FDF846 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DEA7E2241E04AD9300FDF846 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DEA7E22C1E04B88F00FDF846 /* GoogleService-Info (3).plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (3).plist"; sourceTree = "<group>"; };
+		DEA7E22C1E04B88F00FDF846 /* BurgerSt.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BurgerSt.plist; sourceTree = "<group>"; };
+		DEA7E22E1E04C7B800FDF846 /* SizeMatters.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SizeMatters.plist; sourceTree = "<group>"; };
+		DEA7E2311E04C87B00FDF846 /* DataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
+		DEA7E2331E04CCDC00FDF846 /* DataCruncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataCruncher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,14 +90,25 @@
 			children = (
 				DEA7E2151E04AD9300FDF846 /* AppDelegate.swift */,
 				DEA7E2171E04AD9300FDF846 /* ViewController.swift */,
+				DEA7E2331E04CCDC00FDF846 /* DataCruncher.swift */,
 				DEA7E2191E04AD9300FDF846 /* Main.storyboard */,
 				DEA7E21F1E04AD9300FDF846 /* Assets.xcassets */,
 				DEA7E2211E04AD9300FDF846 /* LaunchScreen.storyboard */,
 				DEA7E2241E04AD9300FDF846 /* Info.plist */,
-				DEA7E22C1E04B88F00FDF846 /* GoogleService-Info (3).plist */,
+				DEA7E2301E04C7D300FDF846 /* Clients */,
 				DEA7E21C1E04AD9300FDF846 /* OnionReports.xcdatamodeld */,
+				DEA7E2311E04C87B00FDF846 /* DataService.swift */,
 			);
 			path = OnionReports;
+			sourceTree = "<group>";
+		};
+		DEA7E2301E04C7D300FDF846 /* Clients */ = {
+			isa = PBXGroup;
+			children = (
+				DEA7E22C1E04B88F00FDF846 /* BurgerSt.plist */,
+				DEA7E22E1E04C7B800FDF846 /* SizeMatters.plist */,
+			);
+			name = Clients;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -157,8 +174,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEA7E22F1E04C7B800FDF846 /* SizeMatters.plist in Resources */,
 				DEA7E2231E04AD9300FDF846 /* LaunchScreen.storyboard in Resources */,
-				DEA7E22D1E04B88F00FDF846 /* GoogleService-Info (3).plist in Resources */,
+				DEA7E22D1E04B88F00FDF846 /* BurgerSt.plist in Resources */,
 				DEA7E2201E04AD9300FDF846 /* Assets.xcassets in Resources */,
 				DEA7E21B1E04AD9300FDF846 /* Main.storyboard in Resources */,
 			);
@@ -219,9 +237,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEA7E2341E04CCDC00FDF846 /* DataCruncher.swift in Sources */,
 				DEA7E2181E04AD9300FDF846 /* ViewController.swift in Sources */,
 				DEA7E21E1E04AD9300FDF846 /* OnionReports.xcdatamodeld in Sources */,
 				DEA7E2161E04AD9300FDF846 /* AppDelegate.swift in Sources */,
+				DEA7E2321E04C87B00FDF846 /* DataService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +405,7 @@
 				DEA7E2291E04AD9300FDF846 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
