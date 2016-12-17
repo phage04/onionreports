@@ -49,7 +49,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
 
     @IBAction func didPressSend(_ sender: Any) {
         
-        SwiftSpinner.show("the nerds are working...").addTapHandler({
+        SwiftSpinner.show("the elves are working...").addTapHandler({
             SwiftSpinner.hide()
         }, subtitle: "tap anytime to exit")
         
@@ -245,9 +245,18 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func sendEmail(){
  
-                
-        let key = mailGunKey
+        let contents = "One,Two,Three,Four,Five"
+        dataToFile(contents: contents, period: "\(fromDateText.text!)\(toDateText.text!)")
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        let path = dir?.appendingPathComponent("OnionReport_\(fromDateText.text!)\(toDateText.text!).csv")
         
+        let headers: HTTPHeaders = [
+            "Content-Type": "multipart/form-data"
+        ]
+        let URL = try! URLRequest(url: "https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, headers: headers)
+
+        let key = mailGunKey
+    
         let parameters = [
             "Authorization" : "api:\(key)",
             "from": "info@\(mailGunURL)",
@@ -256,18 +265,68 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             "text": "Dear \(clientNameText.text!), Attached is the report for this period. Thank you!"
         ]
         
-        _ = Alamofire.request("https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).authenticate(user: "api", password: key).response { response in
+
+        Alamofire.upload(multipartFormData: { (multipartFormData) in
+           
+            multipartFormData.append(path!, withName: "attachment")
             
-            if response.error == nil{
-                SwiftSpinner.hide()
-                self.showErrorAlert("Report Sent", msg: "Congratulations, the report you requested has been sent to \(self.clientEmailText.text!)!", VC: self)
-            } else {
+            for (key, value) in parameters {
+                multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
+            }
+            
+        }, with: URL, encodingCompletion: { (result) in
+            
+            switch (result){
+            case .success(let upload, _, _):
+                upload.responseJSON(completionHandler: { (response) in
+                    print(response.result.value)
+                    print(response.request)
+                    print(response.result)
+                    print(response.data)
+                    print(response.debugDescription)
+                    print(response.response)
+                    if response.result.error == nil{
+                        self.showErrorAlert("Thank You", msg: "In a few moments, we will contact you to confirm your request.", VC: self)
+                    } else {
+                        self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
+                    }
+                })
+                
+                
+            case .failure(let encodingError):
                 SwiftSpinner.hide()
                 self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
             }
             
-        }
+            
+        })
         
+
+        
+    }
+    
+    func dataToFile(contents: String, period: String){
+        // Set the file path
+        let file = "OnionReport_\(period).csv"
+        
+        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            
+            let path = dir.appendingPathComponent(file)
+            
+            //writing
+            do {
+                try contents.write(to: path, atomically: false, encoding: String.Encoding.utf8)
+            }
+            catch {/* error handling here */}
+            
+            //reading
+            do {
+                let data = try String(contentsOf: path, encoding: String.Encoding.utf8)
+                print(data)
+            }
+            catch {/* error handling here */}
+            
+        }
     }
 
 }
