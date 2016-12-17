@@ -61,7 +61,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                     print(result)
                     
                     
-                    sendEmail()
+                    self.sendEmail()
                 })
                 
                
