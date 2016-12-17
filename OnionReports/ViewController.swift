@@ -26,7 +26,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     var clientPicker = UIPickerView()
     let userCalendar = Calendar.current
     let DATE_FORMAT1 = "MMM dd, yyyy"
-
+    
     
     //MAILGUN
     let mailGunKey = "key-5b34852ee5f4c8467b150056b0b5ca1e"
@@ -161,6 +161,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         
         inputView.backgroundColor = UIColor.white
         clientPicker.backgroundColor = UIColor.white
+        
         clientNameText.text = clientPickerData[0]
         inputView.addSubview(clientPicker)
         sender.inputView = inputView
@@ -244,50 +245,44 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func sendEmail(){
- 
+        
+       
         let contents = "One,Two,Three,Four,Five"
         dataToFile(contents: contents, period: "\(fromDateText.text!)\(toDateText.text!)")
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        let path = dir?.appendingPathComponent("OnionReport_\(fromDateText.text!)\(toDateText.text!).csv")
+        let path = dir?.appendingPathComponent("OnionReport.csv")
         
-        let headers: HTTPHeaders = [
-            "Content-Type": "multipart/form-data"
-        ]
-        let URL = try! URLRequest(url: "https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post, headers: headers)
+//        let headers: HTTPHeaders = [
+//            "Content-Type": "multipart/form-data"
+//        ]
+        let URL = try! URLRequest(url: "https://api.mailgun.net/v3/\(mailGunURL)/messages", method: .post)
 
         let key = mailGunKey
     
-        let parameters = [
-            "Authorization" : "api:\(key)",
-            "from": "info@\(mailGunURL)",
-            "to": "\(self.clientEmailText.text!)",
-            "subject": "OnionApps Report for (\(clientNameText.text!)): \(fromDateText.text!) - \(toDateText.text!)",
-            "text": "Dear \(clientNameText.text!), Attached is the report for this period. Thank you!"
-        ]
-        
 
         Alamofire.upload(multipartFormData: { (multipartFormData) in
-           
+            
+            multipartFormData.append("multipart/form-data".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "Content-Type")
+            multipartFormData.append("api:\(key)".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "Authorization")
+            multipartFormData.append("info@\(self.mailGunURL)".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "from")
+            multipartFormData.append("\(self.clientEmailText.text!)".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "to")
+            multipartFormData.append("OnionApps Report for \(self.clientNameText.text!): \(self.fromDateText.text!) - \(self.toDateText.text!)".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "subject")
+            multipartFormData.append("Dear \(self.clientNameText.text!), Attached is the report for this period. Thank you!".data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "text")
             multipartFormData.append(path!, withName: "attachment")
-            
-            for (key, value) in parameters {
-                multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
-            }
-            
+      
+      
         }, with: URL, encodingCompletion: { (result) in
             
             switch (result){
             case .success(let upload, _, _):
-                upload.responseJSON(completionHandler: { (response) in
-                    print(response.result.value)
+                upload.response(completionHandler: { (response) in
                     print(response.request)
-                    print(response.result)
-                    print(response.data)
-                    print(response.debugDescription)
                     print(response.response)
-                    if response.result.error == nil{
+                    if response.error == nil{
+                        SwiftSpinner.hide()
                         self.showErrorAlert("Thank You", msg: "In a few moments, we will contact you to confirm your request.", VC: self)
                     } else {
+                        SwiftSpinner.hide()
                         self.showErrorAlert("Something Went Wrong", msg: "We're working on it. Please try again later.", VC: self)
                     }
                 })
@@ -300,29 +295,30 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             
             
         })
-        
+    
 
         
     }
     
     func dataToFile(contents: String, period: String){
         // Set the file path
-        let file = "OnionReport_\(period).csv"
+        let file = "OnionReport.csv"
         
         if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            
+
             let path = dir.appendingPathComponent(file)
             
             //writing
             do {
                 try contents.write(to: path, atomically: false, encoding: String.Encoding.utf8)
+                print("WROTE OnionReport.csv created at tmp directory")
             }
             catch {/* error handling here */}
             
             //reading
             do {
                 let data = try String(contentsOf: path, encoding: String.Encoding.utf8)
-                print(data)
+                print("READ \(data) from File OnionReport.csv created at tmp directory")
             }
             catch {/* error handling here */}
             
